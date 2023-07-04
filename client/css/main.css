@@ -1,0 +1,126 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; }
+
+body {
+  padding-top: 20px; }
+
+.upload {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 300px; }
+  .upload-area {
+    width: 100%;
+    height: 150px;
+    border: 2px dashed #ccc;
+    font-size: 1.5rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1; }
+    .upload-area--gray {
+      background-color: #f5f5f5; }
+    .upload-area__title {
+      color: green; }
+    .upload-area__count {
+      color: darkgoldenrod; }
+    .upload-area__input {
+      position: absolute;
+      left: 0;
+      top: 0;
+      cursor: pointer;
+      display: inline;
+      width: 100%;
+      height: 100%;
+      opacity: 0; }
+  .upload-list {
+    padding-top: 10px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; }
+  .upload .list-item {
+    display: flex;
+    flex-direction: column; }
+    .upload .list-item__title {
+      width: 80%;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis; }
+    .upload .list-item__progress {
+      width: 100%;
+      display: flex;
+      justify-content: space-between; }
+      .upload .list-item__progress--gray {
+        width: 80%;
+        height: 20px;
+        background-color: #f0f0f0; }
+      .upload .list-item__progress--blue {
+        height: 100%;
+        width: 0;
+        background-color: #3498db; }
+      .upload .list-item__progress--percent {
+        font-weight: 700; }
+  .upload-btns {
+    padding-top: 10px;
+    display: flex;
+    justify-content: space-between; }
+  .upload-btn {
+    width: 48%;
+    border: none;
+    color: white;
+    padding: 5px;
+    cursor: pointer;
+    transition: all 0.5s; }
+    .upload-btn:hover {
+      color: black; }
+    .upload-btn:disabled:hover {
+      color: white; }
+    .upload-btn--red {
+      background-color: red; }
+    .upload-btn--green {
+      background-color: green; }
+    .upload-btn--opacity {
+      opacity: 0.5; }
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2;
+  padding-top: 100px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: black;
+  background-color: rgba(0, 0, 0, 0.4); }
+  .modal__content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    max-width: 50%;
+    position: relative;
+    border-radius: 15px; }
+  .modal__text {
+    text-transform: uppercase;
+    word-spacing: 4px;
+    text-align: center; }
+  .modal__close {
+    color: #aaaaaa;
+    position: absolute;
+    right: 8px;
+    top: 0px;
+    font-size: 1.5rem;
+    font-weight: bold; }
+    .modal__close:hover, .modal__close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer; }

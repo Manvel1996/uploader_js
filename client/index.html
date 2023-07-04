@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Uploader</title>
+    <link rel="stylesheet" href="./css/main.css" />
+    <script src="./js/script.js" defer></script>
+  </head>
+  <body>
+    <div class="upload">
+      <div class="upload-area">
+        <p class="upload-area__title">Drag and drop files here</p>
+
+        <p class="upload-area__count"></p>
+
+        <input type="file" class="upload-area__input" multiple />
+      </div>
+
+      <div class="upload-list"></div>
+
+      <div class="upload-btns">
+        <button class="upload-btn upload-btn--red">Reset</button>
+        <button class="upload-btn upload-btn--green upload-btn--opacity" disabled>
+          Submit
+        </button>
+      </div>
+    </div>
+
+    <div class="modal">
+      <div class="modal__content">
+        <span class="modal__close">&times;</span>
+        <p class="modal__text"></p>
+      </div>
+    </div>
+  </body>
+</html>
