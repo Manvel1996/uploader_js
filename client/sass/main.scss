@@ -30,6 +30,12 @@ body {
       background-color: #f5f5f5;
     }
 
+    &--red{
+      opacity: 0.5;
+      border-color: red;
+      pointer-events: none
+    }
+
     &__title {
       color: green;
     }
@@ -87,6 +93,14 @@ body {
         background-color: #3498db;
       }
 
+      &--green {
+        background-color: green;
+      }
+
+      &--red{
+        background-color: rgb(247, 84, 84);
+      }
+
       &--percent {
         font-weight: 700;
       }
@@ -124,7 +138,8 @@ body {
       background-color: green;
     }
 
-    &--opacity {
+    &--disabled {
+      cursor: not-allowed;
       opacity: 0.5;
     }
   }

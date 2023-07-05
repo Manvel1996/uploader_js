@@ -1,5 +1,6 @@
-const dropArea = document.querySelector(".upload-area");
+const uploadArea = document.querySelector(".upload-area");
 const fileCount = document.querySelector(".upload-area__count");
+fileCount.innerText = 0;
 const fileInput = document.querySelector(".upload-area__input");
 const fileList = document.querySelector(".upload-list");
 const fileSubmit = document.querySelector(".upload-btn--green");
@@ -13,13 +14,10 @@ const URL = "http://localhost:4444";
 let filesToUpload = [];
 let sliceFiles = [];
 
-fileCount.innerText = 0;
+function uploadFiles(files) {
+  let countUploads = 0;
 
-function uploadFiles(file) {
-  new Promise((resolve, reject) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
+  files.forEach((file) => {
     const item = document.createElement("div");
     item.classList.add("list-item");
 
@@ -45,49 +43,73 @@ function uploadFiles(file) {
     item.append(itemName, progress);
     fileList.appendChild(item);
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", URL + "/upload", true);
+    const formData = new FormData();
+    formData.append("file", file);
 
-    xhr.upload.addEventListener("progress", (event) => {
-      if (event.lengthComputable) {
-        const percentComplete = (event.loaded / event.total) * 100;
+    new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", URL + "/upload", true);
 
-        progressBarFill.style.width = percentComplete + "%";
-        percent.innerText = percentComplete.toFixed() + "%";
-      }
-    });
+      xhr.addEventListener("load", () => {
+        if (xhr.status !== 200) {
+          reject();
+        }
 
-    xhr.addEventListener("error", () => {
-      openModal("Upload failed for file: " + file.name, "red");
-    });
+        resolve();
+      });
 
-    xhr.addEventListener("load", () => {
-      if (xhr.status !== 200) {
-        openModal(JSON.parse(xhr.responseText).message, "red");
-      }
-      resolve();
-    });
+      xhr.upload.addEventListener("progress", (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = (event.loaded / event.total) * 100;
 
-    xhr.send(formData);
-  })
-    .catch((err) => openModal(err, "red"))
-    .finally(() => {
-      fileCount.innerText = 0;
-      submitFiles();
-    });
+          progressBarFill.style.width = percentComplete + "%";
+          percent.innerText = percentComplete.toFixed() + "%";
+
+          if (percentComplete === 100) {
+            countUploads += 1;
+            if (countUploads === files.length) {
+              fileCount.innerText = filesToUpload.length;
+              submitFiles();
+            }
+          }
+        }
+      });
+
+      xhr.addEventListener("error", () => reject(xhr.statusText));
+
+      xhr.send(formData);
+    })
+      .then(() => {
+        progressBarFill.classList.add("list-item__progress--green");
+      })
+      .catch(() => {
+        progressBarFill.classList.add("list-item__progress--red");
+      });
+  });
 }
 
 function resetFile() {
   filesToUpload = [];
   sliceFiles = [];
   fileCount.innerText = 0;
+  fileList.innerHTML = "";
 
-  submitStatus(true);
+  uploadArea.classList.remove("upload-area--red");
+
+  btnDisabled(fileSubmit, true);
+  btnDisabled(fileReset, true);
 }
 
-function submitFiles() {
+function submitFiles(isClicked) {
+  if (isClicked) {
+    btnDisabled(fileSubmit, true);
+    btnDisabled(fileReset, true);
+    uploadArea.classList.add("upload-area--red");
+  }
+
   if (filesToUpload.length === 0) {
-    submitStatus(true);
+    btnDisabled(fileReset, false);
+    uploadArea.classList.remove("upload-area--red");
     return;
   } else if (filesToUpload.length > 3) {
     sliceFiles = filesToUpload.slice(0, 3);
@@ -97,14 +119,12 @@ function submitFiles() {
     filesToUpload = [];
   }
 
-  sliceFiles.forEach((file) => {
-    uploadFiles(file);
-  });
+  uploadFiles(sliceFiles);
 }
 
-function submitStatus(boolean) {
-  fileSubmit.disabled = boolean;
-  fileSubmit.classList.toggle("upload-btn--opacity", boolean);
+function btnDisabled(btn, boolean) {
+  btn.disabled = boolean;
+  btn.classList.toggle("upload-btn--disabled", boolean);
 }
 
 function openModal(text, color) {
@@ -128,31 +148,34 @@ fileInput.addEventListener("change", () => {
   fileCount.innerText = filesToUpload.length;
 
   if (filesToUpload.length > 0) {
-    submitStatus(false);
+    btnDisabled(fileSubmit, false);
+    btnDisabled(fileReset, false);
   }
 });
 
-dropArea.addEventListener("dragover", (event) => {
+uploadArea.addEventListener("dragover", (event) => {
   event.preventDefault();
-  dropArea.classList.add("upload-area--gray");
+  uploadArea.classList.add("upload-area--gray");
 });
 
-dropArea.addEventListener("dragleave", () => {
-  dropArea.classList.remove("upload-area--gray");
+uploadArea.addEventListener("dragleave", () => {
+  uploadArea.classList.remove("upload-area--gray");
 });
 
-dropArea.addEventListener("drop", (event) => {
+uploadArea.addEventListener("drop", (event) => {
   event.preventDefault();
+
+  uploadArea.classList.remove("upload-area--gray");
 
   filesToUpload = [...filesToUpload, ...Array.from(event.dataTransfer.files)];
 
   fileCount.innerText = filesToUpload.length;
-  dropArea.classList.remove("upload-area--gray");
 
   if (filesToUpload.length > 0) {
-    submitStatus(false);
+    btnDisabled(fileSubmit, false);
+    btnDisabled(fileReset, false);
   }
 });
 
 fileReset.addEventListener("click", resetFile);
-fileSubmit.addEventListener("click", submitFiles);
+fileSubmit.addEventListener("click", () => submitFiles(true));
