@@ -6,9 +6,7 @@ const fileList = document.querySelector(".upload-list");
 const fileSubmit = document.querySelector(".upload-btn--green");
 const fileReset = document.querySelector(".upload-btn--red");
 
-const modal = document.querySelector(".modal");
-const modalClose = document.querySelector(".modal__close");
-const modalText = document.querySelector(".modal__text");
+
 
 const URL = "http://localhost:4444";
 let filesToUpload = [];
@@ -126,22 +124,6 @@ function btnDisabled(btn, boolean) {
   btn.disabled = boolean;
   btn.classList.toggle("upload-btn--disabled", boolean);
 }
-
-function openModal(text, color) {
-  modalText.innerText = text;
-  modal.style.display = "block";
-  modalText.style.color = color;
-}
-
-modalClose.addEventListener("click", () => {
-  modal.style.display = "none";
-});
-
-window.addEventListener("click", (event) => {
-  if (event.target === modal) {
-    modal.style.display = "none";
-  }
-});
 
 fileInput.addEventListener("change", () => {
   filesToUpload = [...filesToUpload, ...Array.from(fileInput.files)];
