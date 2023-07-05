@@ -6,11 +6,8 @@ const fileList = document.querySelector(".upload-list");
 const fileSubmit = document.querySelector(".upload-btn--green");
 const fileReset = document.querySelector(".upload-btn--red");
 
-
-
 const URL = "http://localhost:4444";
 let filesToUpload = [];
-let sliceFiles = [];
 
 function uploadFiles(files) {
   let countUploads = 0;
@@ -88,7 +85,6 @@ function uploadFiles(files) {
 
 function resetFile() {
   filesToUpload = [];
-  sliceFiles = [];
   fileCount.innerText = 0;
   fileList.innerHTML = "";
 
@@ -99,6 +95,8 @@ function resetFile() {
 }
 
 function submitFiles(isClicked) {
+  let sliceFiles = [];
+
   if (isClicked) {
     btnDisabled(fileSubmit, true);
     btnDisabled(fileReset, true);
