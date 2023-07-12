@@ -1,39 +1,36 @@
 const uploadArea = document.querySelector(".upload-area");
 const fileCount = document.querySelector(".upload-area__count");
-fileCount.innerText = 0;
 const fileInput = document.querySelector(".upload-area__input");
 const fileList = document.querySelector(".upload-list");
-const fileSubmit = document.querySelector(".upload-btn--green");
-const fileReset = document.querySelector(".upload-btn--red");
+const fileSubmit = document.querySelector(".upload-button--green");
+const fileReset = document.querySelector(".upload-button--red");
 
 const URL = "http://localhost:4444";
 let filesToUpload = [];
+
+fileCount.innerText = 0;
 
 function uploadFiles(files) {
   let countUploads = 0;
 
   files.forEach((file) => {
     const item = document.createElement("div");
-    item.classList.add("list-item");
-
     const itemName = document.createElement("p");
-    itemName.classList.add("list-item__title");
+    const progress = document.createElement("div");
+    const progressBar = document.createElement("div");
+    const progressBarFill = document.createElement("div");
+    const percent = document.createElement("p");
+
     itemName.innerText = file.name;
 
-    const progress = document.createElement("div");
+    item.classList.add("list-item");
+    itemName.classList.add("list-item__title");
     progress.classList.add("list-item__progress");
-
-    const progressBar = document.createElement("div");
     progressBar.classList.add("list-item__progress--gray");
-
-    const progressBarFill = document.createElement("div");
     progressBarFill.classList.add("list-item__progress--blue");
-
-    progressBar.appendChild(progressBarFill);
-
-    const percent = document.createElement("p");
     percent.classList.add("list-item__progress--percent");
 
+    progressBar.appendChild(progressBarFill);
     progress.append(progressBar, percent);
     item.append(itemName, progress);
     fileList.appendChild(item);
@@ -41,70 +38,54 @@ function uploadFiles(files) {
     const formData = new FormData();
     formData.append("file", file);
 
-    new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", URL + "/upload", true);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", URL + "/upload", true);
 
-      xhr.addEventListener("load", () => {
-        if (xhr.status !== 200) {
-          reject();
-        }
+   
 
-        resolve();
-      });
+    xhr.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = (event.loaded / event.total) * 100;
 
-      xhr.upload.addEventListener("progress", (event) => {
-        if (event.lengthComputable) {
-          const percentComplete = (event.loaded / event.total) * 100;
+        progressBarFill.style.width = percentComplete + "%";
+        percent.innerText = percentComplete.toFixed() + "%";
 
-          progressBarFill.style.width = percentComplete + "%";
-          percent.innerText = percentComplete.toFixed() + "%";
+        if (percentComplete === 100) {
 
-          if (percentComplete === 100) {
-            countUploads += 1;
+          xhr.addEventListener("load", () => {
+            console.log("load", countUploads);
+      
+            if (xhr.status === 200) {
+              progressBarFill.classList.add("list-item__progress--green");
+            } else {
+              progressBarFill.classList.add("list-item__progress--red");
+            }
+      
             if (countUploads === files.length) {
               fileCount.innerText = filesToUpload.length;
-              submitFiles();
+              uploadFilesSlices();
             }
-          }
+          });
+          console.log(100);
+          countUploads += 1;
         }
-      });
+      }
+    });
 
-      xhr.addEventListener("error", () => reject(xhr.statusText));
+    xhr.addEventListener("error", () => {
+      console.log("err");
+      progressBarFill.classList.add("list-item__progress--red");
+    });
 
-      xhr.send(formData);
-    })
-      .then(() => {
-        progressBarFill.classList.add("list-item__progress--green");
-      })
-      .catch(() => {
-        progressBarFill.classList.add("list-item__progress--red");
-      });
+    xhr.send(formData);
   });
 }
 
-function resetFile() {
-  filesToUpload = [];
-  fileCount.innerText = 0;
-  fileList.innerHTML = "";
-
-  uploadArea.classList.remove("upload-area--red");
-
-  btnDisabled(fileSubmit, true);
-  btnDisabled(fileReset, true);
-}
-
-function submitFiles(isClicked) {
+function uploadFilesSlices() {
   let sliceFiles = [];
 
-  if (isClicked) {
-    btnDisabled(fileSubmit, true);
-    btnDisabled(fileReset, true);
-    uploadArea.classList.add("upload-area--red");
-  }
-
   if (filesToUpload.length === 0) {
-    btnDisabled(fileReset, false);
+    buttonDisabled(fileReset, false);
     uploadArea.classList.remove("upload-area--red");
     return;
   } else if (filesToUpload.length > 3) {
@@ -118,20 +99,42 @@ function submitFiles(isClicked) {
   uploadFiles(sliceFiles);
 }
 
-function btnDisabled(btn, boolean) {
-  btn.disabled = boolean;
-  btn.classList.toggle("upload-btn--disabled", boolean);
+function resetFile() {
+  filesToUpload = [];
+  fileCount.innerText = 0;
+  fileList.innerHTML = "";
+
+  uploadArea.classList.remove("upload-area--red");
+
+  buttonDisabled(fileSubmit, true);
+  buttonDisabled(fileReset, true);
 }
 
-fileInput.addEventListener("change", () => {
-  filesToUpload = [...filesToUpload, ...Array.from(fileInput.files)];
+function submitFiles() {
+  buttonDisabled(fileSubmit, true);
+  buttonDisabled(fileReset, true);
+
+  uploadArea.classList.add("upload-area--red");
+
+  uploadFilesSlices();
+}
+
+function addUploadFiles(files) {
+  filesToUpload = [...filesToUpload, ...Array.from(files)];
   fileCount.innerText = filesToUpload.length;
 
   if (filesToUpload.length > 0) {
-    btnDisabled(fileSubmit, false);
-    btnDisabled(fileReset, false);
+    buttonDisabled(fileSubmit, false);
+    buttonDisabled(fileReset, false);
   }
-});
+}
+
+function buttonDisabled(button, boolean) {
+  button.disabled = boolean;
+  button.classList.toggle("upload-button--disabled", boolean);
+}
+
+fileInput.addEventListener("change", (e) => addUploadFiles(e.target.files));
 
 uploadArea.addEventListener("dragover", (event) => {
   event.preventDefault();
@@ -142,19 +145,11 @@ uploadArea.addEventListener("dragleave", () => {
   uploadArea.classList.remove("upload-area--gray");
 });
 
-uploadArea.addEventListener("drop", (event) => {
-  event.preventDefault();
+uploadArea.addEventListener("drop", (e) => {
+  e.preventDefault();
 
   uploadArea.classList.remove("upload-area--gray");
-
-  filesToUpload = [...filesToUpload, ...Array.from(event.dataTransfer.files)];
-
-  fileCount.innerText = filesToUpload.length;
-
-  if (filesToUpload.length > 0) {
-    btnDisabled(fileSubmit, false);
-    btnDisabled(fileReset, false);
-  }
+  addUploadFiles(e.dataTransfer.files);
 });
 
 fileReset.addEventListener("click", resetFile);

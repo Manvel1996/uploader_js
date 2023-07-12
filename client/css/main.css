@@ -75,25 +75,25 @@ body {
         background-color: #f75454; }
       .upload .list-item__progress--percent {
         font-weight: 700; }
-  .upload-btns {
+  .upload-buttons {
     padding-top: 10px;
     display: flex;
     justify-content: space-between; }
-  .upload-btn {
+  .upload-button {
     width: 48%;
     border: none;
     color: white;
     padding: 5px;
     cursor: pointer;
     transition: all 0.5s; }
-    .upload-btn:hover {
+    .upload-button:hover {
       color: black; }
-    .upload-btn:disabled:hover {
+    .upload-button:disabled:hover {
       color: white; }
-    .upload-btn--red {
+    .upload-button--red {
       background-color: red; }
-    .upload-btn--green {
+    .upload-button--green {
       background-color: green; }
-    .upload-btn--disabled {
+    .upload-button--disabled {
       cursor: not-allowed;
       opacity: 0.5; }
