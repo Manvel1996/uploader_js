@@ -12,7 +12,12 @@
       <div class="upload-area">
         <p class="upload-area__title">Drag and drop files here</p>
 
-        <p class="upload-area__count"></p>
+        <div class="upload-counts">
+          <p class="upload-counts__count">Success <span class="upload-counts__count--green"></span></p>
+          <p class="upload-counts__count">Failed <span class="upload-counts__count--red"></span></p>
+          <p class="upload-counts__count">Pending <span class="upload-counts__count--orange"></span></p>
+        </div>
+        
 
         <input type="file" class="upload-area__input" multiple />
       </div>

@@ -1,14 +1,21 @@
-const URL = "http://localhost:4444";
+const URL = "http://localhost:8080";
 let filesToUpload = [];
+let uploadFinishCount = 0;
+let success = 0;
+let failed = 0;
 
 const uploadArea = document.querySelector(".upload-area");
-const fileCount = document.querySelector(".upload-area__count");
+const successCount = document.querySelector(".upload-counts__count--green");
+const failedCount = document.querySelector(".upload-counts__count--red");
+const pendingCount = document.querySelector(".upload-counts__count--orange");
 const fileInput = document.querySelector(".upload-area__input");
 const fileList = document.querySelector(".upload-list");
 const fileSubmit = document.querySelector(".upload-button--green");
 const fileReset = document.querySelector(".upload-button--red");
 
-fileCount.innerText = 0;
+successCount.innerText = success;
+failedCount.innerText = failed;
+pendingCount.innerText = 0;
 
 function uploadFiles(file, progressBarFill, percent, callback) {
   const formData = new FormData();
@@ -30,14 +37,14 @@ function uploadFiles(file, progressBarFill, percent, callback) {
     if (xhr.status === 200 && xhr.readyState === 4) {
       callback(undefined, true);
     } else {
-      callback(undefined, false);
+      callback(true, undefined);
     }
   });
 
   xhr.send(formData);
 }
 
-function createProgressBar(file, index, arr) {
+function createProgressBar(file, arr) {
   const item = document.createElement("div");
   const itemName = document.createElement("p");
   const progress = document.createElement("div");
@@ -59,18 +66,25 @@ function createProgressBar(file, index, arr) {
   item.append(itemName, progress);
   fileList.appendChild(item);
 
-  uploadFiles(file, progressBarFill, percent, (err, data) => {
+  function callBack(err, data) {
     if (data) {
       progressBarFill.classList.add("list-item__progress--green");
-    } else {
+      successCount.innerText = ++success;
+      uploadFinishCount += 1;
+    } else if (err) {
       progressBarFill.classList.add("list-item__progress--red");
+      failedCount.innerText = ++failed;
+      uploadFinishCount += 1;
     }
 
-    if (index === arr.length - 1) {
-      fileCount.innerText = filesToUpload.length;
+    if (uploadFinishCount === arr.length) {
+      uploadFinishCount = 0;
+      pendingCount.innerText = filesToUpload.length;
       uploadFilesSlices();
     }
-  });
+  }
+
+  uploadFiles(file, progressBarFill, percent, callBack);
 }
 
 function uploadFilesSlices() {
@@ -88,14 +102,19 @@ function uploadFilesSlices() {
     filesToUpload = [];
   }
 
-  sliceFiles.forEach((file, index, arr) => {
-    createProgressBar(file, index, arr);
+  sliceFiles.forEach((file, i, arr) => {
+    createProgressBar(file, arr);
   });
 }
 
 function resetFile() {
   filesToUpload = [];
-  fileCount.innerText = 0;
+  success = 0;
+  failed = 0;
+
+  successCount.innerText = success;
+  failedCount.innerText = success;
+  pendingCount.innerText = filesToUpload.length;
   fileList.innerHTML = "";
 
   uploadArea.classList.remove("upload-area--red");
@@ -115,7 +134,7 @@ function submitFiles() {
 
 function addUploadFiles(files) {
   filesToUpload = [...filesToUpload, ...Array.from(files)];
-  fileCount.innerText = filesToUpload.length;
+  pendingCount.innerText = filesToUpload.length;
 
   if (filesToUpload.length > 0) {
     buttonDisabled(fileSubmit, false);

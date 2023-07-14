@@ -23,6 +23,19 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 1; }
+    .upload-area .upload-counts {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 10px; }
+      .upload-area .upload-counts__count {
+        font-size: 1.25rem; }
+        .upload-area .upload-counts__count--green {
+          color: green; }
+        .upload-area .upload-counts__count--red {
+          color: red; }
+        .upload-area .upload-counts__count--orange {
+          color: orange; }
     .upload-area--gray {
       background-color: #f5f5f5; }
     .upload-area--red {
@@ -31,8 +44,6 @@ body {
       pointer-events: none; }
     .upload-area__title {
       color: green; }
-    .upload-area__count {
-      color: darkgoldenrod; }
     .upload-area__input {
       position: absolute;
       left: 0;

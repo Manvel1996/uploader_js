@@ -27,6 +27,29 @@ body {
     align-items: center;
     z-index: 1;
 
+    .upload-counts{
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 10px;
+
+      &__count{
+        font-size: 1.25rem;
+
+        &--green{
+          color: green;
+        }
+
+        &--red{
+          color: red;
+        }
+
+        &--orange{
+          color: orange;
+        }
+      }
+    }
+
     &--gray {
       background-color: #f5f5f5;
     }
@@ -39,10 +62,6 @@ body {
 
     &__title {
       color: green;
-    }
-
-    &__count {
-      color: darkgoldenrod;
     }
 
     &__input {
